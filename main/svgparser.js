@@ -3,11 +3,10 @@
  * A library to convert an SVG string to parse-able segments for CAD/CAM use
  * Licensed under the MIT license
  */
+import { Matrix } from '../build/matrix.js';
 
- (function(root){
-	'use strict';
-
-	function SvgParser(){
+export class SvgParser {
+	constructor(){
 		// the SVG document
 		this.svg;
 
@@ -30,12 +29,12 @@
 		this.dirPath = null;
 	}
 
-	SvgParser.prototype.config = function(config){
+	config(config){
 		this.conf.tolerance = Number(config.tolerance);
 		this.conf.endpointTolerance = Number(config.endpointTolerance);
 	}
 
-	SvgParser.prototype.load = function(dirpath, svgString, scale, scalingFactor){
+	load(dirpath, svgString, scale, scalingFactor){
 
 		if(!svgString || typeof svgString !== 'string'){
 			throw Error('invalid SVG string');
@@ -145,7 +144,7 @@
 	}
 
 	// use the utility functions in this class to prepare the svg for CAD-CAM/nest related operations
-	SvgParser.prototype.cleanInput = function(dxfFlag){
+	cleanInput(dxfFlag){
 
 		// apply any transformations, so that all path positions etc will be in the same coordinate space
 		this.applyTransform(this.svgRoot, '', false, dxfFlag);
@@ -187,7 +186,7 @@
 	}
 
 
-	SvgParser.prototype.imagePaths = function(svg){
+	imagePaths(svg){
 		if(!this.dirPath){
 			return false;
 		}
@@ -206,7 +205,7 @@
 	}
 
 	// return a path from list that has one and only one endpoint that is coincident with the given path
-	SvgParser.prototype.getCoincident = function(path, list, tolerance){
+	getCoincident(path, list, tolerance){
 		var index = list.indexOf(path);
 
 		if(index < 0 || index == list.length-1){
@@ -238,7 +237,7 @@
 		return null;
 	}
 
-	SvgParser.prototype.mergeLines = function(root, tolerance){
+	mergeLines(root, tolerance){
 
 		/*for(var i=0; i<root.children.length; i++){
 			var p = root.children[i];
@@ -331,7 +330,7 @@
 	}
 
 	// merge all line objects that overlap eachother
-	SvgParser.prototype.mergeOverlap = function(root, tolerance){
+	mergeOverlap(root, tolerance){
 		var min2 = 0.001;
 
 		var paths = Array.prototype.slice.call(root.children);
@@ -492,7 +491,7 @@
 	}
 
 	// split paths and polylines into separate line objects
-	SvgParser.prototype.splitLines = function(root){
+	splitLines(root){
 		var paths = Array.prototype.slice.call(root.children);
 
 		var lines = [];
@@ -553,7 +552,7 @@
 	}
 
 	// turn one path into individual segments
-	SvgParser.prototype.splitPathSegments = function(path){
+	splitPathSegments(path){
 		// we'll assume that splitpath has already been run on this path, and it only has one M/m command
 		var seglist = path.pathSegList;
 		var split = [];
@@ -600,7 +599,7 @@
 	};
 
 	// reverse an open path in place, where an open path could by any of line, polyline or path types
-	SvgParser.prototype.reverseOpenPath = function(path){
+	reverseOpenPath(path){
 		/*if(path.endpoints){
 			var temp = path.endpoints.start;
 			path.endpoints.start = path.endpoints.end;
@@ -717,7 +716,7 @@
 
 
 	// merge b into a, assuming the end of a coincides with the start of b
-	SvgParser.prototype.mergeOpenPaths = function(a, b){
+	mergeOpenPaths(a, b){
 		var topath = function(svg, p){
 			if(p.tagName == 'line'){
 				var pa = svg.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -785,7 +784,7 @@
 		return patha;
 	}
 
-	SvgParser.prototype.isClosed = function(p, tolerance){
+	isClosed(p, tolerance){
 		var openElements = ['line', 'polyline', 'path'];
 
 		if(openElements.indexOf(p.tagName) < 0){
@@ -854,7 +853,7 @@
 		}
 	}
 
-	SvgParser.prototype.getEndpoints = function(p){
+	getEndpoints(p){
 		var start, end;
 		if(p.tagName == 'line'){
 			start = {
@@ -898,7 +897,7 @@
 
 	// set the given path as absolute coords (capital commands)
 	// from http://stackoverflow.com/a/9677915/433888
-	SvgParser.prototype.pathToAbsolute = function(path){
+	pathToAbsolute(path){
 		if(!path || path.tagName != 'path'){
 			throw Error('invalid path');
 		}
@@ -938,10 +937,9 @@
 			if (command=='M' || command=='m') x0=x, y0=y;
 		}
 	};
-
 	// takes an SVG transform string and returns corresponding SVGMatrix
 	// from https://github.com/fontello/svgpath
-	SvgParser.prototype.transformParse = function(transformString){
+	transformParse(transformString){
 		var operations = {
 			matrix: true,
 			scale: true,
@@ -1024,7 +1022,7 @@
 	}
 
 	// recursively apply the transform property to the given element
-	SvgParser.prototype.applyTransform = function(element, globalTransform, skipClosed, dxfFlag){
+	applyTransform(element, globalTransform, skipClosed, dxfFlag){
 
 		globalTransform = globalTransform || '';
 		var transformString = element.getAttribute('transform') || '';
@@ -1239,7 +1237,7 @@
 	}
 
 	// bring all child elements to the top level
-	SvgParser.prototype.flatten = function(element){
+	flatten(element){
 		for(var i=0; i<element.children.length; i++){
 			this.flatten(element.children[i]);
 		}
@@ -1253,7 +1251,7 @@
 
 	// remove all elements with tag name not in the whitelist
 	// use this to remove <text>, <g> etc that don't represent shapes
-	SvgParser.prototype.filter = function(whitelist, element){
+	filter(whitelist, element){
 		if(!whitelist || whitelist.length == 0){
 			throw Error('invalid whitelist');
 		}
@@ -1270,7 +1268,7 @@
 	}
 
 	// split a compound path (paths with M, m commands) into an array of paths
-	SvgParser.prototype.splitPath = function(path){
+	splitPath(path){
 		if(!path || path.tagName != 'path' || !path.parentElement){
 			return false;
 		}
@@ -1344,7 +1342,7 @@
 	}
 
 	// recursively run the given function on the given element
-	SvgParser.prototype.recurse = function(element, func){
+	recurse(element, func){
 		// only operate on original DOM tree, ignore any children that are added. Avoid infinite loops
 		var children = Array.prototype.slice.call(element.children);
 		for(var i=0; i<children.length; i++){
@@ -1355,7 +1353,7 @@
 	}
 
 	// return a polygon from the given SVG element in the form of an array of points
-	SvgParser.prototype.polygonify = function(element){
+	polygonify(element){
 		var poly = [];
 		var i;
 
@@ -1450,7 +1448,7 @@
 		return poly;
 	};
 
-	SvgParser.prototype.polygonifyPath = function(path){
+	polygonifyPath(path){
 		// we'll assume that splitpath has already been run on this path, and it only has one M/m command
 		var seglist = path.pathSegList;
 		var poly = [];
@@ -1567,24 +1565,4 @@
 
 		return poly;
 	};
-
-	// expose public methods
-	var parser = new SvgParser();
-
-	root.SvgParser = {
-		config: parser.config.bind(parser),
-		load: parser.load.bind(parser),
-		clean: parser.cleanInput.bind(parser),
-		polygonify: parser.polygonify.bind(parser),
-		polygonifyPath: parser.polygonifyPath.bind(parser),
-		isClosed: parser.isClosed.bind(parser),
-		applyTransform: parser.applyTransform.bind(parser),
-		transformParse: parser.transformParse.bind(parser),
-		flatten: parser.flatten.bind(parser),
-		splitLines: parser.splitLines.bind(parser),
-		mergeLines: parser.mergeLines.bind(parser),
-		mergeOverlap: parser.mergeOverlap.bind(parser),
-		polygonElements: parser.polygonElements
-	};
-
-}(this));
+}
