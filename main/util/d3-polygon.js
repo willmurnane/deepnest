@@ -1,18 +1,10 @@
 // https://d3js.org/d3-polygon/ Version 1.0.2. Copyright 2016 Mike Bostock.
-(function (global, factory) {
-  typeof exports === "object" && typeof module !== "undefined"
-    ? factory(exports)
-    : typeof define === "function" && define.amd
-    ? define(["exports"], factory)
-    : factory((global.d3 = global.d3 || {}));
-})(this, function (exports) {
-  "use strict";
 
   // Returns the 2D cross product of AB and AC vectors, i.e., the z-component of
   // the 3D cross product in a quadrant I Cartesian coordinate system (+x is
   // right, +y is up). Returns a positive value if ABC is counter-clockwise,
   // negative if clockwise, and zero if the points are collinear.
-  var cross = function (a, b, c) {
+  function cross(a, b, c) {
     return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
   };
 
@@ -44,7 +36,7 @@
     return indexes.slice(0, size); // remove popped points
   }
 
-  var hull = function (points) {
+  export function polygonHull(points) {
     if ((n = points.length) < 3) return null;
 
     var i,
@@ -76,8 +68,3 @@
 
     return hull;
   };
-
-  exports.polygonHull = hull;
-
-  Object.defineProperty(exports, "__esModule", { value: true });
-});

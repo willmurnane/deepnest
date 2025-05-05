@@ -4,6 +4,7 @@
  */
 
 import { simplify } from './util/simplify.js';
+import { polygonHull } from './util/d3-polygon.js';
 
 var config = {
   clipperScale: 10000000,
@@ -135,7 +136,7 @@ export class DeepNest {
       for (var i = 0; i < polygon.length; i++) {
         points.push([polygon[i].x, polygon[i].y]);
       }
-      var hullpoints = d3.polygonHull(points);
+      var hullpoints = polygonHull(points);
 
       if (!hullpoints) {
         return null;

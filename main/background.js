@@ -1,4 +1,5 @@
 'use strict';
+import { polygonHull } from './util/d3-polygon.js';
 
 window.onload = function () {
 	const { ipcRenderer } = require('electron');
@@ -490,7 +491,7 @@ function getHull(polygon) {
 	for (let i = 0; i < polygon.length; i++) {
 		points.push([polygon[i].x, polygon[i].y]);
 	}
-	var hullpoints = d3.polygonHull(points);
+	var hullpoints = polygonHull(points);
 
 	if (!hullpoints) {
 		return polygon;
