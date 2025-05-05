@@ -200,6 +200,7 @@ export class DeepNest {
         }
       }
 
+      // use the simplify function imported from util/simplify.js
       var simple = simplify(copy, tolerance, true);
       // now a polygon again
       simple.pop();
