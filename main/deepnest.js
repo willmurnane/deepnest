@@ -3,6 +3,8 @@
  * Licensed under GPLv3
  */
 
+import { simplify } from './util/simplify.js';
+
 var config = {
   clipperScale: 10000000,
   curveTolerance: 0.3,
@@ -198,7 +200,7 @@ export class DeepNest {
         }
       }
 
-      var simple = window.simplify(copy, tolerance, true);
+      var simple = simplify(copy, tolerance, true);
       // now a polygon again
       simple.pop();
 
